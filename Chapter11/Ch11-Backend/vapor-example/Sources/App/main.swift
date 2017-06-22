@@ -9,7 +9,7 @@ import HTTP
     request data from other servers.
 */
 let drop = Droplet()
-
+   
 /**
     Vapor configuration files are located
     in the root directory of the project
@@ -226,7 +226,96 @@ drop.get("localization", String.self) {
     ])
 }
 
+
+
+
+//**********************************************************************
+
+
+
 /* Swift 3 Functional Programming - Start */
+
+
+
+///  method for Login
+
+drop.post("postLogin") {
+    request in
+    
+    guard let userName = request.headers["userName"],
+        let password = request.headers["password"]
+               else {
+            return try JSON(node: ["message": "Please include mandatory parameters"])
+    }
+    
+    let loginItem = Login(userName : userName, password : password)
+    
+    let myLogin = LoginStore.sharedInstance
+    myLogin.add(item: loginItem)
+    
+    let json = myLogin.myItem()
+    
+    return try JSON(node: json)
+}
+
+//drop.get("getLogin") {
+//    request in
+//    
+//    let json = LoginStore.sharedInstance.myItem()
+//    return try JSON(node: json)
+//}
+
+drop.get("login") {
+    request in
+    guard let userName = request.headers["userName"],
+        let password = request.headers["password"]
+    else{
+        return try JSON(node: ["success": false])
+    }
+    let json = LoginStore.sharedInstance.myItem()
+    let json2 = LoginStore.sharedInstance.myList()
+    
+    let item = Login(userName: userName, password: password)
+    
+    var resultJSON = [String: Bool]()
+    
+    if LoginStore.sharedInstance.find(item) {
+        resultJSON =  ["success": true]
+    }else {
+        resultJSON =  ["success": false]
+    }
+
+    
+    
+    
+    
+    
+//    if userName == json.userName && password == json.password {
+//        resultJSON =  ["success": true]
+//    }else {
+//        resultJSON =  ["success": false]
+//    }
+   
+    return try JSON(node: resultJSON)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /// Post a todo item
 drop.post("postTodo") {
